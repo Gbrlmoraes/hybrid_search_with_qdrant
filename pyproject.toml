@@ -1,0 +1,33 @@
+[project]
+name = "hybrid-search-with-qdrant"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "datasets>=3.6.0",
+    "pandas>=2.3.0",
+    "qdrant-client[fastembed]>=1.14.2",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "ruff>=0.11.13",
+    "taskipy>=1.14.1",
+]
+
+[tool.ruff.lint]
+preview = true
+select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[tool.taskipy.tasks]
+lint = 'ruff check'
+
+pre_format = 'ruff check --fix'
+format = 'ruff format'
+
+pre_qdrant = 'docker run -d --rm -p 6333:6333 -v "%cd%\qdrant_storage":/qdrant/storage --name qdrant qdrant/qdrant'
+qdrant = 'start http://localhost:6333/dashboard#/welcome'
