@@ -18,5 +18,7 @@ The implementation in this repository is based on concepts and tutorials from th
 * **[Hybrid Search Revamped - Building with Qdrant's Query API](https://qdrant.tech/articles/hybrid-search/)**: An overview of the core concepts behind Qdrant's modern hybrid search capabilities.
 * **[Beginner Tutorial: Setup Hybrid Search with FastEmbed](https://qdrant.tech/documentation/beginner-tutorials/hybrid-search-fastembed/)**: A practical guide to setting up a basic hybrid search system.
 * **[Advanced Tutorial: Reranking in Hybrid Search](https://qdrant.tech/documentation/advanced-tutorials/reranking-hybrid-search/)**: A tutorial on implementing a reranking step to improve search precision.
-
+* **[Introduction to Matryoshka Embedding Models](https://huggingface.co/blog/matryoshka)**: Introduces the concept of Matryoska Embeddings
+* **[BM42: New Baseline for Hybrid Search](https://qdrant.tech/articles/bm42/)**: Introduces the BM42 model and discuss about BM25 vs SPLADE
+* **[Bulk Upload Vectors to a Qdrant Collection](https://qdrant.tech/documentation/database-tutorials/bulk-upload/)**: Information about efficient ways to upsert data in Qdrant
 ---
