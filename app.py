@@ -14,11 +14,11 @@ with st.sidebar:
         'Number of final results', min_value=1, max_value=10, value=3, step=1
     )
 
-    sparse_top_k = st.slider(
+    top_k_sparse = st.slider(
         'Number of sparse results', min_value=1, max_value=20, value=10, step=1
     )
 
-    dense_top_k = st.slider(
+    top_k_dense = st.slider(
         'Number of dense results', min_value=1, max_value=20, value=10, step=1
     )
 
@@ -49,17 +49,17 @@ query = st.text_input('Enter your query:')
 
 if query:
     # Sparse search
-    # tic = time.time()
-    # sparse_result = st.session_state.retriever.sparse_query(
-    #     query, top_k=sparse_top_k, labels=labels
-    # )
-    # tac = time.time()
-    # sparse_result_time_ms = (tac - tic) * 1000
+    tic = time.time()
+    sparse_result = st.session_state.retriever.sparse_query(
+        query, top_k=top_k_sparse, labels=labels
+    )
+    tac = time.time()
+    sparse_result_time_ms = (tac - tic) * 1000
 
     # Dense search
     tic = time.time()
     dense_result = st.session_state.retriever.dense_query(
-        query, top_k=dense_top_k, labels=labels
+        query, top_k=top_k_dense, labels=labels
     )
     tac = time.time()
     dense_result_time_ms = (tac - tic) * 1000
@@ -70,8 +70,8 @@ if query:
         query,
         top_k=top_k,
         labels=labels,
-        top_k_dense=dense_top_k,
-        top_k_sparse=sparse_top_k,
+        top_k_dense=top_k_dense,
+        top_k_sparse=top_k_sparse,
     )
     tac = time.time()
     result_time_ms = (tac - tic) * 1000
@@ -83,9 +83,13 @@ if query:
 
     with col1:
         st.markdown('#### Sparse Search Results:')
-        # st.markdown(f'{sparse_result_time_ms:.2f} ms',)
-        # for point in sparse_result.points:
-        #     st.markdown(f"{point.payload['text']}")
+        st.markdown(
+            f'{sparse_result_time_ms:.2f} ms',
+        )
+        for point in sparse_result.points:
+            st.markdown(f'Score: {point.score:.4f}')
+            st.markdown(f'{point.payload["text"]}')
+            st.markdown('---')
 
     with col2:
         st.markdown('#### Dense Search Results:')
@@ -93,7 +97,9 @@ if query:
             f'{dense_result_time_ms:.2f} ms',
         )
         for point in dense_result.points:
+            st.markdown(f'Score: {point.score:.4f}')
             st.markdown(f'{point.payload["text"]}')
+            st.markdown('---')
 
     with col3:
         st.markdown('#### Final Search Results:')
@@ -101,4 +107,6 @@ if query:
             f'{result_time_ms:.2f} ms',
         )
         for point in result.points:
+            st.markdown(f'Score: {point.score:.4f}')
             st.markdown(f'{point.payload["text"]}')
+            st.markdown('---')
