@@ -35,3 +35,5 @@ format = 'ruff format'
 
 pre_qdrant = 'docker run -d --rm -p 6333:6333 -v "%cd%\qdrant_storage":/qdrant/storage --name qdrant qdrant/qdrant'
 qdrant = 'start http://localhost:6333/dashboard#/welcome'
+
+run = 'streamlit run ./app.py'
