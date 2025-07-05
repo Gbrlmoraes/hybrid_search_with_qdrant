@@ -97,11 +97,13 @@ class EmbeddingPipeline:
                         multivector_config=models.MultiVectorConfig(
                             comparator=models.MultiVectorComparator.MAX_SIM,
                         ),
+                        hnsw_config=models.HnswConfigDiff(m=0),  # Not necessary for R-R
                     ),
                 },
                 sparse_vectors_config={
                     self.sparse_model_name: models.SparseVectorParams(
-                        modifier=models.Modifier.IDF
+                        modifier=models.Modifier.IDF,
+                        index=models.SparseIndexParams(on_disk=False),
                     )
                 },
             )
