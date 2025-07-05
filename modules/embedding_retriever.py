@@ -26,34 +26,37 @@ class EmbeddingRetriever:
             self.late_interaction_model_name
         )
 
-    def sparse_query(self, query: str, labels: list[str], top_k: int = 10):
+    def sparse_query(
+        self,
+        query: str,
+        labels: list[str],
+        top_k: int = 10,
+    ):
         # Create embeddings for the query
-        sparse_vec = next(self.sparse_embedding_model.query_embed(query))
+        sparse_vectors = next(self.sparse_embedding_model.query_embed(query))
 
         # Filter the documents based on labels
         label_filter = models.Filter(
-            should=[
+            must=[
                 models.FieldCondition(
-                    key='metadata.label', match=models.MatchValue(value=lbl)
+                    key='metadata.label', match=models.MatchAny(any=labels)
                 )
-                for lbl in labels
-            ],
-            min_should_match=1,
+            ]
         )
 
-        # Create a NamedSparseVector for the query
-        named_sparse = models.NamedSparseVector(
-            name=self.sparse_model_name,
-            vector=models.SparseVector(**sparse_vec.as_object()),
+        sparse_vec = sparse_vectors.as_object()
+        sparse_query = models.SparseVector(
+            indices=sparse_vec['indices'],
+            values=sparse_vec['values'],
         )
 
-        # Sparse search
-        results = self.qdrant_client.search(
+        results = self.qdrant_client.query_points(
             collection_name=self.collection_name,
-            query_vector=named_sparse,
-            query_filter=label_filter,
-            limit=top_k,
+            query=sparse_query,
+            using=self.sparse_model_name,
             with_payload=True,
+            limit=top_k,
+            query_filter=label_filter,
         )
 
         return results
@@ -151,7 +154,7 @@ if __name__ == '__main__':
             print('Exiting...')
             break
 
-        query_result = retriever.query(query, top_k=5, labels=['Business'])
+        query_result = retriever.query(query, top_k=5, labels=['Sci/Tech'])
 
         for point in query_result.points:
             print(f'- Score: {point.score}: Text: {point.payload["text"]}')
