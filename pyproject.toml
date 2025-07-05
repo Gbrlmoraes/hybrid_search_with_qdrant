@@ -5,7 +5,9 @@ requires-python = ">=3.13"
 dependencies = [
     "datasets>=3.6.0",
     "pandas>=2.3.0",
+    "pydantic>=2.11.5",
     "qdrant-client[fastembed]>=1.14.2",
+    "streamlit>=1.46.1",
     "tqdm>=4.67.1",
 ]
 
