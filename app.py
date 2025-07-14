@@ -1,47 +1,56 @@
+import os
 import time
 
+import pandas as pd
 import streamlit as st
 
 from modules.embedding_retriever import EmbeddingRetriever
+
+RESOURCES_DIR = os.path.join(os.path.dirname(__file__), 'resources')
 
 st.set_page_config(
     page_title='Hybrid Search',
 )
 
-with st.sidebar:
-    # Number of results selector
-    top_k = st.slider(
-        'Number of final results', min_value=1, max_value=10, value=3, step=1
+
+@st.cache_resource
+def get_dataset():
+    # Reads the dataset from the parquet file in resources
+    return pd.read_parquet(
+        os.path.join(RESOURCES_DIR, 'dataset.parquet'),
     )
 
+
+with st.sidebar:
+    # Number of results selector
     top_k_sparse = st.slider(
-        'Number of sparse results', min_value=1, max_value=20, value=10, step=1
+        'Number of sparse results', min_value=1, max_value=20, value=5, step=1
     )
 
     top_k_dense = st.slider(
-        'Number of dense results', min_value=1, max_value=20, value=10, step=1
+        'Number of dense results', min_value=1, max_value=20, value=5, step=1
+    )
+
+    top_k = st.slider(
+        'Number of final results', min_value=1, max_value=10, value=5, step=1
     )
 
     # Filter labels selector
+    label_options = get_dataset()['category'].unique().tolist()
     labels = st.multiselect(
         'Filter by label',
-        options=[
-            'World',
-            'Sports',
-            'Business',
-            'Sci/Tech',
-        ],
-        default=['Sci/Tech'],
+        options=label_options,
+        default=label_options,
     )
 
 
-st.title('Hybrid Search')
+st.title('Product Search')
 
 # Initialize the retriever
 if 'retriever' not in st.session_state:
     st.session_state.retriever = EmbeddingRetriever(
         qdrant_url='http://localhost:6333',
-        collection_name='news_hybrid_search',
+        collection_name='products_hybrid_search',
     )
 
 # Make the query

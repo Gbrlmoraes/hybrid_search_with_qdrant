@@ -156,8 +156,8 @@ if __name__ == '__main__':
     import pandas as pd
 
     # Loads the dataset from the parquet file in resources
-    # Note: You can download the dataset using the script "get_dataset.py"
-    # in the scripts folder, the dataset comes from Hugging Face.
+    # Note: You can download the original dataset from https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
+    # and save it as 'resources/amazon.csv', them run the get_dataset.py script
     df = pd.read_parquet(
         os.path.join(
             os.path.dirname(__file__),
@@ -167,29 +167,20 @@ if __name__ == '__main__':
         )
     )
 
-    # Note: The complete dataset hast 120,000 documents, if you have limited resources,
-    # or want to test the pipeline quickly, you can use weither a smaller sample
-    # or choose a label to filter the documents.
-    df = (
-        df.groupby('label')
-        .apply(lambda x: x.sample(500, random_state=42), include_groups=False)
-        .reset_index(drop=False)
-    )
-
     documents = []
     for _, row in df.iterrows():
         documents.append(
             Document(
                 text=row['text'],
                 metadata={
-                    'label': row['label'],
+                    'label': row['category'],
                 },
             ),
         )
 
     pipeline = EmbeddingPipeline(
         qdrant_url='http://localhost:6333',
-        collection_name='news_hybrid_search',
+        collection_name='products_hybrid_search',
         dense_embedding_model='sentence-transformers/all-MiniLM-L6-v2',
         sparse_embedding_model='Qdrant/bm25',
         late_interaction_embedding_model='colbert-ir/colbertv2.0',

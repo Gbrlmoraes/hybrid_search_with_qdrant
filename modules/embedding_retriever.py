@@ -144,7 +144,7 @@ class EmbeddingRetriever:
 
 if __name__ == '__main__':
     retriever = EmbeddingRetriever(
-        qdrant_url='http://localhost:6333', collection_name='news_hybrid_search'
+        qdrant_url='http://localhost:6333', collection_name='products_hybrid_search'
     )
 
     while True:
@@ -154,7 +154,7 @@ if __name__ == '__main__':
             print('Exiting...')
             break
 
-        query_result = retriever.query(query, top_k=5, labels=['Sci/Tech'])
+        query_result = retriever.query(query, top_k=5, labels=['Computers&Accessories'])
 
         for point in query_result.points:
             print(f'- Score: {point.score}: Text: {point.payload["text"]}')
