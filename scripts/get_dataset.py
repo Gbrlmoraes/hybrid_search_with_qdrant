@@ -1,31 +1,36 @@
 import os
 
 import pandas as pd
-from datasets import load_dataset
+
+RESOURCES_DIR = os.path.join(os.path.dirname(__file__), '..', 'resources')
 
 
 def get_dataset() -> pd.DataFrame:
     """
-    Load the AG News dataset from Hugging Face and prepare it for use.
+    Load the Amazon Sales Dataset from a CSV file.
+    The dataset is from the following Kaggle repository: https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
+    The dataset is expected to be in the 'resources' directory as 'amazon.csv'.
     Returns:
-        pd.DataFrame: A DataFrame containing the text and labels of the AG News dataset.
+        pd.DataFrame: A DataFrame containing the text and labels of the Amazon Sales
+        Dataset.
     """
 
-    print('Loading the AG News dataset from HuggingFace...')
-    hf_dataset = load_dataset('ag_news', split='train')
-    df = hf_dataset.to_pandas()
+    print('Reading the Amazon CSV...')
+    df = pd.read_csv(
+        os.path.join(RESOURCES_DIR, 'amazon.csv'),
+        usecols=['product_name', 'category'],
+        dtype={'product_name': str, 'category': str},
+    )
 
     # Data preparation
-    class_names = [
-        'World',
-        'Sports',
-        'Business',
-        'Sci/Tech',
-    ]  # 0 -> World, 1 -> Sports, 2 -> Business, 3 -> Sci/Tech
-    df['label'] = df['label'].apply(lambda x: class_names[x])
+    df = df.drop_duplicates(subset=['product_name'])[['product_name', 'category']]
+    df.rename(columns={'product_name': 'text'}, inplace=True)
+    df['category'] = df['category'].apply(
+        lambda x: x.split('|')[0] if isinstance(x, str) else x
+    )
 
     print('- Dataset loaded and prepared successfully.')
-    return df[['text', 'label']]
+    return df
 
 
 if __name__ == '__main__':
