@@ -21,4 +21,6 @@ The implementation in this repository is based on concepts and tutorials from th
 * **[Introduction to Matryoshka Embedding Models](https://huggingface.co/blog/matryoshka)**: Introduces the concept of Matryoska Embeddings
 * **[BM42: New Baseline for Hybrid Search](https://qdrant.tech/articles/bm42/)**: Introduces the BM42 model and discuss about BM25 vs SPLADE
 * **[Bulk Upload Vectors to a Qdrant Collection](https://qdrant.tech/documentation/database-tutorials/bulk-upload/)**: Information about efficient ways to upsert data in Qdrant
+
+Dataset source: https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
 ---
