@@ -1,10 +1,3 @@
-
-### TODO
-# - Add examples for each search type as a sugestion in the UI
-# - Add a documentation page explaining the models and the tools used in the project,
-# with sources
-# - Add images from Qdrant to increment the understanding
-
 import os
 import time
 
@@ -13,17 +6,21 @@ import streamlit as st
 
 from modules.embedding_retriever import EmbeddingRetriever
 
-RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "resources")
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+RESOURCES_DIR = os.path.join(ROOT_DIR, "resources")
+ASSETS_DIR = os.path.join(ROOT_DIR, "assets")
 
 st.set_page_config(
     page_title="Hybrid Search Explained",
     layout="wide",
 )
 
+
 @st.cache_resource
 def get_dataset():
     """Reads the dataset from the parquet file in resources."""
     return pd.read_parquet(os.path.join(RESOURCES_DIR, "dataset.parquet"))
+
 
 @st.cache_resource
 def get_retriever():
@@ -66,6 +63,14 @@ with st.sidebar:
         "Filter by category", options=label_options, default=label_options
     )
 
+    st.header("About")
+    st.markdown(
+        """
+        To know more about the techniques and the project implementation, 
+        check out the [GitHub documentation](https://github.com/your-username/hybrid_search_with_qdrant).
+        """
+    )
+
 st.title("🔬 Hybrid Search Explained")
 
 PROJECT_DESCRIPTION = """
@@ -74,14 +79,26 @@ This interactive app demonstrates how a modern hybrid search system works by bre
 -   **Sparse Search**: A fast keyword search using **`Qdrant/bm25`**.
 -   **Dense Search**: A semantic search that understands meaning, powered by **`sentence-transformers/all-MiniLM-L6-v2`**.
 -   **Final Reranked Search**: A sophisticated two-stage process where candidates from the first two searches are intelligently re-ordered by a **`colbert-ir/colbertv2.0`** late-interaction model for maximum accuracy.
-
-Use the sidebar controls to adjust the number of results from each initial search and see how the different components contribute to the final, high-quality outcome.
 """
 
 st.markdown(PROJECT_DESCRIPTION)
 
+col1, col2, col3 = st.columns(spec=[1, 3, 1])
+
+with col2:
+    with st.container():
+        st.image(
+            os.path.join(ASSETS_DIR, "search_overview.png"),
+            caption="Source: [Reranking Hybrid Search Results with Qdrant Vector Database](https://qdrant.tech/documentation/advanced-tutorials/reranking-hybrid-search/)",
+            use_container_width=True,
+        )
+
+st.markdown(
+    "Use the sidebar controls to adjust the number of results from each initial search and see how the different components contribute to the final, high-quality outcome."
+)
+
 retriever = get_retriever()
-query = st.text_input("Enter your query:", "fast charging cable for s21")
+query = st.text_input("Enter your query:", "High capacity SSD")
 
 if query:
     # Performing each search type
@@ -112,6 +129,7 @@ if query:
     - **How it works:** This method uses the classic BM25 algorithm to find documents that contain the exact keywords from your query. It scores documents based on the frequency and relevance of the query terms, giving less importance to common words (like 'the' or 'a').
     - **Strengths:** It is extremely fast and precise for matching specific product codes, acronyms, or technical terms. For example, searching for `S21` will reliably find products with that exact string.
     - **Weaknesses:** It has no understanding of semantics or concepts. A search for "quick charger" will *not* match a document that only says "fast power adapter."
+    - **Good for**: Finding exact matches or specific terms that may not be semantically related. Example: Product model names, "like BN59-01259E", and specific keywords for technical specifications, such as "128Gb Storage"
     """
 
     DENSE_EXPLANATION = """
@@ -122,6 +140,7 @@ if query:
     - **How it works:** This method uses an AI model to convert your query and the documents into numerical vectors that capture their *semantic meaning* or *intent*. The search finds the vectors that are closest in meaning using Cosine Similarity.
     - **Strengths:** It excels at finding conceptually similar items, even if they don't share keywords. It understands that "quick charger" and "fast power adapter" are related concepts.
     - **Weaknesses:** It can sometimes miss a result if a critical keyword is present but doesn't dominate the overall meaning of the text.
+    - **Good for**: Finding products that match the intent of your query, even if they don't use the exact same words. Example: Searching for "fast charging cable" will return results that include "quick charger" or "rapid charge cable," even if those exact phrases aren't present.
     """
 
     FINAL_EXPLANATION = """
