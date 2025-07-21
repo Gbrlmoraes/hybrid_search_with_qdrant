@@ -3,6 +3,10 @@
 
 This repository provides a practical implementation of an advanced hybrid search system using the [Qdrant vector database](https://qdrant.tech/). It demonstrates how to combine traditional keyword-based search (sparse vectors) with modern semantic search (dense vectors) for highly relevant results. A reranking step further refines the output, creating a powerful and intelligent search experience.
 
+<p align="center">
+  <img src="assets/app_home.png" alt="Hybrid Search Example" width="600">
+</p>
+
 ## Main Features
 
 - **Vector Database**: Utilizes Qdrant for high-performance vector storage and retrieval.
@@ -10,6 +14,10 @@ This repository provides a practical implementation of an advanced hybrid search
 - **Reranking**: Implements a second-stage reranker to boost accuracy and relevance.
 - **Embedding Generation**: Uses the [`fastembed`](https://github.com/qdrant/fastembed) library for efficient text embedding creation.
 - **Streamlit UI**: Interactive web interface for exploring search results.
+
+<p align="center">
+  <img src="assets/app_search_example.png" alt="Hybrid Search Example" width="600">
+</p>
 
 ## Local Deployment
 
