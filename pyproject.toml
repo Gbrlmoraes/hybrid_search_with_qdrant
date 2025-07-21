@@ -36,4 +36,8 @@ format = 'ruff format'
 pre_qdrant = 'docker run -d --rm -p 6333:6333 -v "%cd%\qdrant_storage":/qdrant/storage --name qdrant qdrant/qdrant'
 qdrant = 'start http://localhost:6333/dashboard#/welcome'
 
+embed = 'uv run -m scripts.generate_embeddings'
+
+dataset = 'uv run -m scripts.get_dataset'
+
 run = 'streamlit run ./app.py'
