@@ -21,7 +21,8 @@ COPY . .
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Run the embedding task to prepare the application
-RUN uv run task embed
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Run streamlit
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
