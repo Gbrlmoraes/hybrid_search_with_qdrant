@@ -195,3 +195,4 @@ cython_debug/
 
 # Qdrant
 qdrant_storage/
+.fastembed_cache/

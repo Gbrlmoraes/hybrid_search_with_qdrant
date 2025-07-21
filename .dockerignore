@@ -1,0 +1,4 @@
+.venv/
+.gitignore
+.fastembed_cache/
+hybrid_search.ipynb
