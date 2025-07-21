@@ -1,3 +1,5 @@
+import os
+
 from fastembed import LateInteractionTextEmbedding, SparseTextEmbedding, TextEmbedding
 from qdrant_client import QdrantClient, models
 
@@ -19,11 +21,21 @@ class EmbeddingRetriever:
         self.sparse_model_name = sparse_embedding_model
         self.late_interaction_model_name = late_interaction_embedding_model
 
+        self.fastembed_cache = os.path.join(
+            os.path.dirname(__file__),
+            '..',
+            '.fastembed_cache',
+        )
+
         # Load the embedding models
-        self.dense_embedding_model = TextEmbedding(self.dense_model_name)
-        self.sparse_embedding_model = SparseTextEmbedding(self.sparse_model_name)
+        self.dense_embedding_model = TextEmbedding(
+            self.dense_model_name, cache_dir=self.fastembed_cache
+        )
+        self.sparse_embedding_model = SparseTextEmbedding(
+            self.sparse_model_name, cache_dir=self.fastembed_cache
+        )
         self.late_interaction_embedding_model = LateInteractionTextEmbedding(
-            self.late_interaction_model_name
+            self.late_interaction_model_name, cache_dir=self.fastembed_cache
         )
 
     def sparse_query(

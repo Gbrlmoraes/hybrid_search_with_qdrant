@@ -7,27 +7,31 @@ import streamlit as st
 from modules.embedding_retriever import EmbeddingRetriever
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-RESOURCES_DIR = os.path.join(ROOT_DIR, "resources")
-ASSETS_DIR = os.path.join(ROOT_DIR, "assets")
+RESOURCES_DIR = os.path.join(ROOT_DIR, 'resources')
+ASSETS_DIR = os.path.join(ROOT_DIR, 'assets')
 
 st.set_page_config(
-    page_title="Hybrid Search Explained",
-    layout="wide",
+    page_title='Hybrid Search Explained',
+    layout='wide',
 )
 
 
 @st.cache_resource
 def get_dataset():
     """Reads the dataset from the parquet file in resources."""
-    return pd.read_parquet(os.path.join(RESOURCES_DIR, "dataset.parquet"))
+    return pd.read_parquet(os.path.join(RESOURCES_DIR, 'dataset.parquet'))
 
 
 @st.cache_resource
 def get_retriever():
     """Initializes the retriever and caches it for the session."""
+    # Read connection details from environment variables
+    qdrant_host = os.getenv('QDRANT_HOST', 'localhost')
+    qdrant_port = os.getenv('QDRANT_PORT', '6333')
+
     return EmbeddingRetriever(
-        qdrant_url="http://localhost:6333",
-        collection_name="products_hybrid_search",
+        qdrant_url=f'http://{qdrant_host}:{qdrant_port}',
+        collection_name='products_hybrid_search',
     )
 
 
@@ -36,34 +40,34 @@ def display_search_results(title: str, time_ms: float, results, explanation: str
     st.subheader(title)
 
     # Explanation for each search type
-    with st.expander("What am I looking at?"):
+    with st.expander('What am I looking at?'):
         st.markdown(explanation)
 
-    st.info(f"Query Time: {time_ms:.2f} ms")
+    st.info(f'Query Time: {time_ms:.2f} ms')
 
     if not results or not results.points:
-        st.warning("No results found.")
+        st.warning('No results found.')
         return
 
     for point in results.points:
         with st.container(border=True):
-            st.markdown(f"**Score: {point.score:.4f}**")
-            st.write(point.payload["text"])
+            st.markdown(f'**Score: {point.score:.4f}**')
+            st.write(point.payload['text'])
 
 
 with st.sidebar:
-    st.header("Search Parameters")
-    top_k_sparse = st.slider("Number of sparse results", 1, 20, 5)
-    top_k_dense = st.slider("Number of dense results", 1, 20, 5)
-    top_k = st.slider("Number of final results", 1, 10, 5)
+    st.header('Search Parameters')
+    top_k_sparse = st.slider('Number of sparse results', 1, 20, 5)
+    top_k_dense = st.slider('Number of dense results', 1, 20, 5)
+    top_k = st.slider('Number of final results', 1, 10, 5)
 
-    st.header("Filters")
-    label_options = get_dataset()["category"].unique().tolist()
+    st.header('Filters')
+    label_options = get_dataset()['category'].unique().tolist()
     labels = st.multiselect(
-        "Filter by category", options=label_options, default=label_options
+        'Filter by category', options=label_options, default=label_options
     )
 
-    st.header("About")
+    st.header('About')
     st.markdown(
         """
         To know more about the techniques and the project implementation, 
@@ -71,7 +75,7 @@ with st.sidebar:
         """
     )
 
-st.title("🔬 Hybrid Search Explained")
+st.title('🔬 Hybrid Search Explained')
 
 PROJECT_DESCRIPTION = """
 This interactive app demonstrates how a modern hybrid search system works by breaking it down into its core components. It allows you to visually compare the results from three distinct search strategies, all powered by models defined in your project:
@@ -88,17 +92,17 @@ col1, col2, col3 = st.columns(spec=[1, 3, 1])
 with col2:
     with st.container():
         st.image(
-            os.path.join(ASSETS_DIR, "search_overview.png"),
-            caption="Source: [Reranking Hybrid Search Results with Qdrant Vector Database](https://qdrant.tech/documentation/advanced-tutorials/reranking-hybrid-search/)",
+            os.path.join(ASSETS_DIR, 'search_overview.png'),
+            caption='Source: [Reranking Hybrid Search Results with Qdrant Vector Database](https://qdrant.tech/documentation/advanced-tutorials/reranking-hybrid-search/)',
             use_container_width=True,
         )
 
 st.markdown(
-    "Use the sidebar controls to adjust the number of results from each initial search and see how the different components contribute to the final, high-quality outcome."
+    'Use the sidebar controls to adjust the number of results from each initial search and see how the different components contribute to the final, high-quality outcome.'
 )
 
 retriever = get_retriever()
-query = st.text_input("Enter your query:", "High capacity SSD")
+query = st.text_input('Enter your query:', 'High capacity SSD')
 
 if query:
     # Performing each search type
@@ -129,7 +133,7 @@ if query:
     - **How it works:** This method uses the classic BM25 algorithm to find documents that contain the exact keywords from your query. It scores documents based on the frequency and relevance of the query terms, giving less importance to common words (like 'the' or 'a').
     - **Strengths:** It is extremely fast and precise for matching specific product codes, acronyms, or technical terms. For example, searching for `S21` will reliably find products with that exact string.
     - **Weaknesses:** It has no understanding of semantics or concepts. A search for "quick charger" will *not* match a document that only says "fast power adapter."
-    - **Good for**: Finding exact matches or specific terms that may not be semantically related. Example: Product model names, "like BN59-01259E", and specific keywords for technical specifications, such as "128Gb Storage"
+    - **Good for**: Finding exact matches or specific terms that may not be semantically related. Example: Product model names, like "BN59-01259E", and specific keywords for technical specifications, such as "128Gb Storage"
     """
 
     DENSE_EXPLANATION = """
@@ -157,19 +161,21 @@ if query:
     """
 
     # Display the results
-    st.markdown("---")
+    st.markdown('---')
     col1, col2, col3 = st.columns(3)
 
     with col1:
         display_search_results(
-            "1. Sparse Search", sparse_result_time_ms, sparse_result, SPARSE_EXPLANATION
+            '1. Sparse Search', sparse_result_time_ms, sparse_result, SPARSE_EXPLANATION
         )
     with col2:
         display_search_results(
-            "2. Dense Search", dense_result_time_ms, dense_result, DENSE_EXPLANATION
+            '2. Dense Search', dense_result_time_ms, dense_result, DENSE_EXPLANATION
         )
     with col3:
         display_search_results(
-            "3. Final (Reranked) Search", final_result_time_ms,
-            final_result, FINAL_EXPLANATION
+            '3. Final (Reranked) Search',
+            final_result_time_ms,
+            final_result,
+            FINAL_EXPLANATION,
         )

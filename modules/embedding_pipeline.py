@@ -1,3 +1,5 @@
+import os
+
 from fastembed import LateInteractionTextEmbedding, SparseTextEmbedding, TextEmbedding
 from pydantic import BaseModel, Field
 from qdrant_client import QdrantClient, models
@@ -35,6 +37,12 @@ class EmbeddingPipeline:
         self.qdrant_client = QdrantClient(url=qdrant_url)
         self.collection_name = collection_name
 
+        self.fastembed_cache = os.path.join(
+            os.path.dirname(__file__),
+            '..',
+            '.fastembed_cache',
+        )
+
         # Defines the models to be used
         self.dense_model_name = dense_embedding_model
         self.sparse_model_name = sparse_embedding_model
@@ -45,7 +53,9 @@ class EmbeddingPipeline:
         total_documents = len(documents)
 
         # Process texts to create dense embeddings
-        self.dense_embedding_model = TextEmbedding(self.dense_model_name)
+        self.dense_embedding_model = TextEmbedding(
+            self.dense_model_name, cache_dir=self.fastembed_cache
+        )
         self.dense_embeddings = list(
             self.dense_embedding_model.embed(
                 tqdm(
@@ -57,7 +67,9 @@ class EmbeddingPipeline:
         )
 
         # Process texts to create sparse embeddings
-        self.sparse_embedding_model = SparseTextEmbedding(self.sparse_model_name)
+        self.sparse_embedding_model = SparseTextEmbedding(
+            self.sparse_model_name, cache_dir=self.fastembed_cache
+        )
         self.sparse_embeddings = list(
             self.sparse_embedding_model.embed(
                 tqdm(
@@ -70,7 +82,7 @@ class EmbeddingPipeline:
 
         # Process texts to create late interaction (re-ranking) embeddings
         self.late_interaction_embedding_model = LateInteractionTextEmbedding(
-            self.late_interaction_model_name
+            self.late_interaction_model_name, cache_dir=self.fastembed_cache
         )
         self.late_interaction_embeddings = list(
             self.late_interaction_embedding_model.embed(
@@ -148,42 +160,3 @@ class EmbeddingPipeline:
         self._create_embeddings(documents)
         self._create_collection_if_not_exists()
         self._upsert_values(batch_size=batch_size)
-
-
-if __name__ == '__main__':
-    import os
-
-    import pandas as pd
-
-    # Loads the dataset from the parquet file in resources
-    # Note: You can download the original dataset from https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
-    # and save it as 'resources/amazon.csv', them run the get_dataset.py script
-    df = pd.read_parquet(
-        os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            'resources',
-            'dataset.parquet',
-        )
-    )
-
-    documents = []
-    for _, row in df.iterrows():
-        documents.append(
-            Document(
-                text=row['text'],
-                metadata={
-                    'label': row['category'],
-                },
-            ),
-        )
-
-    pipeline = EmbeddingPipeline(
-        qdrant_url='http://localhost:6333',
-        collection_name='products_hybrid_search',
-        dense_embedding_model='sentence-transformers/all-MiniLM-L6-v2',
-        sparse_embedding_model='Qdrant/bm25',
-        late_interaction_embedding_model='colbert-ir/colbertv2.0',
-    )
-
-    pipeline.run(documents=documents, batch_size=8)
