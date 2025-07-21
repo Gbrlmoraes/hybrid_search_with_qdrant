@@ -1,26 +1,79 @@
+
 # Hybrid Search with Qdrant
 
-This repository provides a practical implementation of an advanced hybrid search system using the Qdrant vector database.
+This repository provides a practical implementation of an advanced hybrid search system using the [Qdrant vector database](https://qdrant.tech/). It demonstrates how to combine traditional keyword-based search (sparse vectors) with modern semantic search (dense vectors) for highly relevant results. A reranking step further refines the output, creating a powerful and intelligent search experience.
 
-The project demonstrates how to effectively combine traditional keyword-based search (sparse vectors) with modern semantic search (dense vectors) to achieve highly relevant results. It also incorporates a reranking step to further refine the search output for maximum precision, creating a powerful and intelligent search experience.
+## Main Features
 
-## Core Concepts
+- **Vector Database**: Utilizes Qdrant for high-performance vector storage and retrieval.
+- **Hybrid Search**: Merges dense vectors (semantic meaning) and sparse vectors (keyword matching) into a single query.
+- **Reranking**: Implements a second-stage reranker to boost accuracy and relevance.
+- **Embedding Generation**: Uses the [`fastembed`](https://github.com/qdrant/fastembed) library for efficient text embedding creation.
+- **Streamlit UI**: Interactive web interface for exploring search results.
 
-* **Vector Database**: Utilizes **Qdrant** for high-performance vector storage and retrieval.
-* **Hybrid Search**: Merges dense vectors (for semantic meaning) and sparse vectors (for keyword matching) into a single, powerful query.
-* **Reranking**: Implements a second-stage reranker that re-orders the retrieved results to significantly boost accuracy and relevance.
-* **Embedding Generation**: Leverages the `fastembed` library for efficient and high-quality text embedding creation.
+## Local Deployment
+
+### With Docker
+1. **Clone the repository**:
+   ```powershell
+   git clone https://github.com/Gbrlmoraes/hybrid_search_with_qdrant.git
+   cd hybrid_search_with_qdrant
+   ```
+
+2. **Run Docker Compose**:
+   - Obs: You'll need Docker instaled:
+    ```powershell
+    docker compose up --build
+    ```
+
+### Extra
+
+1. **Prepare the dataset**:
+   - Download the [Amazon Sales Dataset](https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset) and place it in `resources/amazon.csv`.
+   - Run the script to convert it to Parquet:
+    ```powershell
+    python scripts/get_dataset.py
+    ```
+
+## Repository Structure
+
+```
+├── app.py                      # Streamlit web application for hybrid search
+├── Dockerfile                  # Docker image for the app
+├── docker-compose.yaml         # Multi-container orchestration (Qdrant + app)
+├── entrypoint.sh               # Entrypoint script for Docker
+├── pyproject.toml              # Python dependencies and project config
+├── uv.lock                     # Poetry lock file
+├── LICENSE                     # License information
+├── README.md                   # Project documentation
+├── assets/
+│   └── search_overview.png     # Visual overview of the search process
+├── modules/
+│   ├── __init__.py
+│   ├── embedding_pipeline.py   # Embedding pipeline for document processing
+│   └── embedding_retriever.py # Hybrid search and reranking logic
+├── resources/
+│   └── dataset.parquet         # Prepared dataset for search
+├── scripts/
+│   ├── get_dataset.py          # Script to prepare the dataset
+│   └── generate_embeddings.py  # Script to generate and upload embeddings
+└── .streamlit/
+    └── config.toml             # Streamlit configuration
+```
 
 ## Sources and Further Reading
 
-The implementation in this repository is based on concepts and tutorials from the official Qdrant documentation. For a deeper understanding, please refer to the original articles:
+Understanding hybrid search and Qdrant implementation
+- [Hybrid Search Revamped - Building with Qdrant's Query API](https://qdrant.tech/articles/hybrid-search/)
+- [Beginner Tutorial: Setup Hybrid Search with FastEmbed](https://qdrant.tech/documentation/beginner-tutorials/hybrid-search-fastembed/)
+- [Advanced Tutorial: Reranking in Hybrid Search](https://qdrant.tech/documentation/advanced-tutorials/reranking-hybrid-search/)
 
-* **[Hybrid Search Revamped - Building with Qdrant's Query API](https://qdrant.tech/articles/hybrid-search/)**: An overview of the core concepts behind Qdrant's modern hybrid search capabilities.
-* **[Beginner Tutorial: Setup Hybrid Search with FastEmbed](https://qdrant.tech/documentation/beginner-tutorials/hybrid-search-fastembed/)**: A practical guide to setting up a basic hybrid search system.
-* **[Advanced Tutorial: Reranking in Hybrid Search](https://qdrant.tech/documentation/advanced-tutorials/reranking-hybrid-search/)**: A tutorial on implementing a reranking step to improve search precision.
-* **[Introduction to Matryoshka Embedding Models](https://huggingface.co/blog/matryoshka)**: Introduces the concept of Matryoska Embeddings
-* **[BM42: New Baseline for Hybrid Search](https://qdrant.tech/articles/bm42/)**: Introduces the BM42 model and discuss about BM25 vs SPLADE
-* **[Bulk Upload Vectors to a Qdrant Collection](https://qdrant.tech/documentation/database-tutorials/bulk-upload/)**: Information about efficient ways to upsert data in Qdrant
+Best practices
+- [Bulk Upload Vectors to a Qdrant Collection](https://qdrant.tech/documentation/database-tutorials/bulk-upload/)
 
-Dataset source: https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset
----
+Good to know:
+- [BM42: New Baseline for Hybrid Search](https://qdrant.tech/articles/bm42/)
+- [What is ColBERT and Late Interaction and Why They Matter in Search?](https://jina.ai/news/what-is-colbert-and-late-interaction-and-why-they-matter-in-search/)
+
+Dataset source
+- [Amazon Sales Dataset](https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset)
