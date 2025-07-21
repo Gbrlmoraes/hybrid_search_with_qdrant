@@ -15,25 +15,54 @@ This repository provides a practical implementation of an advanced hybrid search
 
 ### With Docker
 1. **Clone the repository**:
-   ```powershell
+   ```bash
    git clone https://github.com/Gbrlmoraes/hybrid_search_with_qdrant.git
    cd hybrid_search_with_qdrant
    ```
 
 2. **Run Docker Compose**:
-   - Obs: You'll need Docker instaled:
-    ```powershell
-    docker compose up --build
-    ```
+   - Note: You'll need Docker installed.
+   ```bash
+   docker compose up --build
+   ```
 
-### Extra
+### Optional (Updating the dataset)
 
 1. **Prepare the dataset**:
    - Download the [Amazon Sales Dataset](https://www.kaggle.com/datasets/karkavelrajaj/amazon-sales-dataset) and place it in `resources/amazon.csv`.
-   - Run the script to convert it to Parquet:
-    ```powershell
-    python scripts/get_dataset.py
-    ```
+
+2. **Set up the Python environment:**
+    - With [`uv`](https://docs.astral.sh/uv/) (recommended)
+        ```bash
+        uv sync --no-dev
+        ```
+    - With Python
+        ```bash
+        python -m venv .venv
+        ```
+    - Activate the environment
+        - **Windows**
+            ```bash
+            .\.venv\Scripts\activate
+            ```
+        - **Linux/macOS**
+            ```bash
+            source .venv/bin/activate
+            ```
+    - Install dependencies
+        ```bash
+        pip install -r requirements.txt
+        ```
+
+3. Run the task to transform the original csv in a parquet ready for the pipeline:
+    - With [`uv`](https://docs.astral.sh/uv/) (recomended)
+        ```bash
+        uv run task embed
+        ```
+    - With python
+        ```bash
+        python -m scripts.get_dataset
+        ```
 
 ## Repository Structure
 
@@ -43,6 +72,7 @@ This repository provides a practical implementation of an advanced hybrid search
 ├── docker-compose.yaml         # Multi-container orchestration (Qdrant + app)
 ├── entrypoint.sh               # Entrypoint script for Docker
 ├── pyproject.toml              # Python dependencies and project config
+├── requirements.txt            # Python dependencies
 ├── uv.lock                     # Poetry lock file
 ├── LICENSE                     # License information
 ├── README.md                   # Project documentation
