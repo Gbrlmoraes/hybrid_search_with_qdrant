@@ -45,9 +45,9 @@ This repository provides a practical implementation of an advanced hybrid search
         uv sync --no-dev
         ```
     - With Python
-          ```bash
-          python -m venv .venv
-          ```
+        ```bash
+        python -m venv .venv
+        ```
       - Activate the environment
           - **Windows**
               ```bash
