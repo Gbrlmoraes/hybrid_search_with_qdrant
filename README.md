@@ -45,22 +45,22 @@ This repository provides a practical implementation of an advanced hybrid search
         uv sync --no-dev
         ```
     - With Python
-        ```bash
-        python -m venv .venv
-        ```
-    - Activate the environment
-        - **Windows**
-            ```bash
-            .\.venv\Scripts\activate
-            ```
-        - **Linux/macOS**
-            ```bash
-            source .venv/bin/activate
-            ```
-    - Install dependencies
-        ```bash
-        pip install -r requirements.txt
-        ```
+          ```bash
+          python -m venv .venv
+          ```
+      - Activate the environment
+          - **Windows**
+              ```bash
+              .\.venv\Scripts\activate
+              ```
+          - **Linux/macOS**
+              ```bash
+              source .venv/bin/activate
+              ```
+      - Install dependencies
+          ```bash
+          pip install -r requirements.txt
+          ```
 
 3. Run the task to transform the original csv in a parquet ready for the pipeline:
     - With [`uv`](https://docs.astral.sh/uv/) (recomended)
